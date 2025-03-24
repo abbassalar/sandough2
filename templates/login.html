@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود - صندوق قرض‌الحسنه</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>ورود به سامانه صندوق قرض‌الحسنه</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">نام کاربری</label>
+                <input type="text" id="username" name="username" placeholder="نام کاربری" required>
+            </div>
+            <div class="form-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" name="password" placeholder="رمز عبور" required>
+            </div>
+            <button type="submit" class="login-btn">ورود به سامانه</button>
+        </form>
+        <div class="footer-text">
+            <a href="{% url 'password_reset' %}">رمز عبور را فراموش کرده‌اید؟</a> |
+            <a href="{% url 'register' %}">ثبت‌نام</a>
+        </div>
+    </div>
+</body>
+</html>
