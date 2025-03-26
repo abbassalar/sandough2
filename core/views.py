@@ -1,31 +1,48 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from balance.models import Balance
+from deposit.models import Deposit
+from withdrawal.models import Withdrawal
+from loan.models import Loan
+from django.db.models import Sum
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return HttpResponse("ورود با موفقیت!")
+            return redirect('dashboard')  # بعد از ورود به داشبورد برو
         else:
-            return HttpResponse("نام کاربری یا رمز عبور اشتباه است!")
+            return render(request, 'core/login.html', {'error': 'نام کاربری یا رمز عبور اشتباه است'})
     return render(request, 'core/login.html')
 
 def register_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = User.objects.create_user(username=username, password=password)
-        user.save()
-        return HttpResponse("ثبت‌نام با موفقیت!")
-    return render(request, 'core/register.html')
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'core/register.html', {'form': form})
 
-def password_reset_view(request):
-    return render(request, 'core/password_reset.html')
+@login_required
+def dashboard_view(request):
+    # محاسبه موجودی
+    balance, created = Balance.objects.get_or_create(user=request.user)
+    deposits = Deposit.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
+    withdrawals = Withdrawal.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
+    balance.total_balance = deposits - withdrawals
+    balance.save()
+
+    # گرفتن وام‌های فعال
+    loans = Loan.objects.filter(user=request.user, is_paid=False)
+
+    return render(request, 'core/dashboard.html', {
+        'balance': balance,
+        'loans': loans,
+    })

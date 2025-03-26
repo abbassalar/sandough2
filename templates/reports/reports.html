@@ -9,7 +9,7 @@
 <body>
     <div class="login-container">
         <h2>گزارش‌های مالی</h2>
-        <h3>واریزها</h3>
+        <h3>واریزها (جمع: {{ total_deposits }} تومان)</h3>
         <ul>
             {% for deposit in deposits %}
                 <li>{{ deposit.date }}: {{ deposit.amount }} تومان</li>
@@ -17,12 +17,20 @@
                 <li>هیچ واریزی ثبت نشده است.</li>
             {% endfor %}
         </ul>
-        <h3>برداشت‌ها</h3>
+        <h3>برداشت‌ها (جمع: {{ total_withdrawals }} تومان)</h3>
         <ul>
             {% for withdrawal in withdrawals %}
                 <li>{{ withdrawal.date }}: {{ withdrawal.amount }} تومان</li>
             {% empty %}
                 <li>هیچ برداشتی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+        <h3>وام‌ها</h3>
+        <ul>
+            {% for loan in loans %}
+                <li>وام {{ loan.amount }} تومان - تاریخ صدور: {{ loan.date_issued }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
+            {% empty %}
+                <li>هیچ وامی ثبت نشده است.</li>
             {% endfor %}
         </ul>
     </div>
