@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>برداشت</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>برداشت وجه</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="amount">مبلغ</label>
+                <input type="number" id="amount" name="amount" required>
+            </div>
+            <button type="submit" class="login-btn">برداشت</button>
+        </form>
+    </div>
+</body>
+</html>

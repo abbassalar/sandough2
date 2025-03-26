@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>گزارش‌ها</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>گزارش‌های مالی</h2>
+        <h3>واریزها</h3>
+        <ul>
+            {% for deposit in deposits %}
+                <li>{{ deposit.date }}: {{ deposit.amount }} تومان</li>
+            {% empty %}
+                <li>هیچ واریزی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+        <h3>برداشت‌ها</h3>
+        <ul>
+            {% for withdrawal in withdrawals %}
+                <li>{{ withdrawal.date }}: {{ withdrawal.amount }} تومان</li>
+            {% empty %}
+                <li>هیچ برداشتی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>برنامه‌ریزی اقساط</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>برنامه‌ریزی اقساط وام</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="loan_id">انتخاب وام</label>
+                <select id="loan_id" name="loan_id" required>
+                    {% for loan in loans %}
+                        <option value="{{ loan.id }}">وام {{ loan.amount }} تومان</option>
+                    {% empty %}
+                        <option value="">وامی برای برنامه‌ریزی وجود ندارد</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="number_of_installments">تعداد اقساط</label>
+                <input type="number" id="number_of_installments" name="number_of_installments" required>
+            </div>
+            <div class="form-group">
+                <label for="amount_per_installment">مبلغ هر قسط</label>
+                <input type="number" id="amount_per_installment" name="amount_per_installment" required>
+            </div>
+            <button type="submit" class="login-btn">ثبت برنامه</button>
+        </form>
+    </div>
+</body>
+</html>

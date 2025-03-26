@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>پرداخت قسط</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>پرداخت قسط وام</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="loan_id">انتخاب وام</label>
+                <select id="loan_id" name="loan_id" required>
+                    {% for loan in loans %}
+                        <option value="{{ loan.id }}">وام {{ loan.amount }} تومان</option>
+                    {% empty %}
+                        <option value="">وامی برای پرداخت وجود ندارد</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount">مبلغ قسط</label>
+                <input type="number" id="amount" name="amount" required>
+            </div>
+            <button type="submit" class="login-btn">پرداخت</button>
+        </form>
+    </div>
+</body>
+</html>
