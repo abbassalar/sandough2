@@ -37,7 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core.apps.CoreConfig'
+    'core.apps.CoreConfig',
+    'deposit.apps.DepositConfig',
+    'withdrawal.apps.WithdrawalConfig',
+    'loan.apps.LoanConfig',
+    'installment_payment.apps.InstallmentPaymentConfig',
+    'installment_planning.apps.InstallmentPlanningConfig',
+    'reports.apps.ReportsConfig',
+    'balance.apps.BalanceConfig',
 ]
 
 MIDDLEWARE = [

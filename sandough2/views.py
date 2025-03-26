@@ -13,7 +13,7 @@ def login_view(request):
             return HttpResponse("ورود با موفقیت!")
         else:
             return HttpResponse("نام کاربری یا رمز عبور اشتباه است!")
-    return render(request, 'login.html')
+    return render(request, 'core/login.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -22,7 +22,7 @@ def register_view(request):
         user = User.objects.create_user(username=username, password=password)
         user.save()
         return HttpResponse("ثبت‌نام با موفقیت!")
-    return render(request, 'register.html')
+    return render(request, 'core/register.html')
 
 def password_reset_view(request):
-    return render(request, 'password_reset.html')  # موقتاً فقط صفحه رو نشون می‌ده
+    return render(request, 'core/password_reset.html')  # موقتاً فقط صفحه رو نشون می‌ده

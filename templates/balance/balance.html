@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تراز مالی</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>تراز مالی</h2>
+        <p>موجودی شما: {{ balance.total_balance }} تومان</p>
+        <p>آخرین به‌روزرسانی: {{ balance.last_updated }}</p>
+    </div>
+</body>
+</html>
