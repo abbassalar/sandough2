@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+from core.views import dashboard_view, test_view
 
 urlpatterns = ([
     path('admin/', admin.site.urls),
@@ -21,6 +22,7 @@ urlpatterns = ([
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('', lambda request: redirect('login'), name='root'),
+    path('test/', test_view, name='test'),
 
 ]
 + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))

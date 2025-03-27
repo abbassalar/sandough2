@@ -7,6 +7,8 @@ from deposit.models import Deposit
 from withdrawal.models import Withdrawal
 from loan.models import Loan
 from django.db.models import Sum
+from django.utils import timezone
+from datetime import datetime
 
 def login_view(request):
     if request.method == 'POST':
@@ -30,6 +32,10 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'core/register.html', {'form': form})
 
+def test_view(request):
+    # یه تاریخ ثابت برای تست
+    test_date = datetime(2025, 3, 27, 14, 30)  # 2025-03-27 14:30
+    return render(request, 'test.html', {'today': test_date})
 @login_required
 def dashboard_view(request):
     # محاسبه موجودی

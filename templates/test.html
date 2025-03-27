@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تست تاریخ شمسی</title>
+    {% load custom_filters %}
+</head>
+<body>
+    <p>تاریخ فعلی: {{ today|to_jalali:"Y/m/d H:i" }}</p>
+</body>
+</html>
