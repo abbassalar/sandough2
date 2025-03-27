@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ویرایش اطلاعات مشتری</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>ویرایش اطلاعات مشتری</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="login-btn">ذخیره تغییرات</button>
+        </form>
+        <a href="{% url 'customer_detail' customer.id %}">بازگشت به جزئیات مشتری</a>
+    </div>
+</body>
+</html>

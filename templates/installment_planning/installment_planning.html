@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>برنامه‌ریزی اقساط</title>
-    {% load static %}
+    {% load static jformat %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -15,7 +15,7 @@
                 <label for="loan_id">انتخاب وام</label>
                 <select id="loan_id" name="loan_id" required>
                     {% for loan in loans %}
-                        <option value="{{ loan.id }}">وام {{ loan.amount }} تومان</option>
+                        <option value="{{ loan.id }}">وام {{ loan.amount|format_price }} ریال</option>
                     {% empty %}
                         <option value="">وامی برای برنامه‌ریزی وجود ندارد</option>
                     {% endfor %}

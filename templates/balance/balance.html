@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>تراز مالی</title>
-    {% load static %}
+    {% load static jformat %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <div class="login-container">
         <h2>تراز مالی</h2>
-        <p>موجودی شما: {{ balance.total_balance }} تومان</p>
-        <p>آخرین به‌روزرسانی: {{ balance.last_updated }}</p>
+        <div class="balance-box">
+            <h3>موجودی شما: {{ balance.total_balance|format_price }} ریال</h3>
+            <p>آخرین به‌روزرسانی: {{ balance.last_updated|jdate:"Y/m/d H:i" }}</p>
+        </div>
     </div>
 </body>
 </html>

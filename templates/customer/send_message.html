@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ارسال پیام به مشتری</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>ارسال پیام به {{ customer.first_name }} {{ customer.last_name }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="content">متن پیام:</label>
+                <textarea id="content" name="content" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="login-btn">ارسال پیام</button>
+        </form>
+        <a href="{% url 'customer_detail' customer.id %}">بازگشت به جزئیات مشتری</a>
+    </div>
+</body>
+</html>

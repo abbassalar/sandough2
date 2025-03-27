@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>گزارش‌ها</title>
-    {% load static %}
+    {% load static jformat %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <div class="login-container">
         <h2>گزارش‌های مالی</h2>
-        <h3>واریزها (جمع: {{ total_deposits }} تومان)</h3>
+        <h3>واریزها (جمع: {{ total_deposits|format_price }} ریال)</h3>
         <ul>
             {% for deposit in deposits %}
-                <li>{{ deposit.date }}: {{ deposit.amount }} تومان</li>
+                <li>{{ deposit.date|jdate:"Y/m/d H:i" }}: {{ deposit.amount|format_price }} ریال</li>
             {% empty %}
                 <li>هیچ واریزی ثبت نشده است.</li>
             {% endfor %}
         </ul>
-        <h3>برداشت‌ها (جمع: {{ total_withdrawals }} تومان)</h3>
+        <h3>برداشت‌ها (جمع: {{ total_withdrawals|format_price }} ریال)</h3>
         <ul>
             {% for withdrawal in withdrawals %}
-                <li>{{ withdrawal.date }}: {{ withdrawal.amount }} تومان</li>
+                <li>{{ withdrawal.date|jdate:"Y/m/d H:i" }}: {{ withdrawal.amount|format_price }} ریال</li>
             {% empty %}
                 <li>هیچ برداشتی ثبت نشده است.</li>
             {% endfor %}
@@ -28,7 +28,7 @@
         <h3>وام‌ها</h3>
         <ul>
             {% for loan in loans %}
-                <li>وام {{ loan.amount }} تومان - تاریخ صدور: {{ loan.date_issued }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
+                <li>وام {{ loan.amount|format_price }} ریال - تاریخ صدور: {{ loan.date_issued|jdate:"Y/m/d H:i" }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
             {% empty %}
                 <li>هیچ وامی ثبت نشده است.</li>
             {% endfor %}

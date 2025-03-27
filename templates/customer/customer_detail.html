@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>جزئیات مشتری</title>
-    {% load static %}
+    {% load static jformat %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -16,16 +16,28 @@
         <p><strong>شماره شناسنامه:</strong> {{ customer.id_number }}</p>
         <p><strong>شماره تماس:</strong> {{ customer.phone_number }}</p>
         <p><strong>آدرس:</strong> {{ customer.address }}</p>
-        <p><strong>تاریخ ثبت:</strong> {{ customer.created_at }}</p>
+        <p><strong>تاریخ ثبت:</strong> {{ customer.created_at|jdate:"Y/m/d H:i" }}</p>
         {% if customer.id_copy %}
             <p><strong>کپی شناسنامه:</strong> <a href="{{ customer.id_copy.url }}" target="_blank">مشاهده</a></p>
         {% endif %}
+
+        <a href="{% url 'edit_customer' customer.id %}" class="menu-btn">ویرایش اطلاعات</a>
+        <a href="{% url 'send_message' customer.id %}" class="menu-btn">ارسال پیام</a>
+
+        <h3>پیام‌ها</h3>
+        <ul>
+            {% for message in messages %}
+                <li>{{ message.sent_at|jdate:"Y/m/d H:i" }}: {{ message.content }} (وضعیت: {% if message.is_read %}خوانده‌شده{% else %}خوانده‌نشده{% endif %})</li>
+            {% empty %}
+                <li>هیچ پیامی برای این مشتری ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
 
         <h3>خدمات انجام‌شده</h3>
         <h4>واریزها</h4>
         <ul>
             {% for deposit in deposits %}
-                <li>{{ deposit.date }}: {{ deposit.amount }} تومان</li>
+                <li>{{ deposit.date|jdate:"Y/m/d H:i" }}: {{ deposit.amount|format_price }} ریال</li>
             {% empty %}
                 <li>هیچ واریزی ثبت نشده است.</li>
             {% endfor %}
@@ -34,7 +46,7 @@
         <h4>برداشت‌ها</h4>
         <ul>
             {% for withdrawal in withdrawals %}
-                <li>{{ withdrawal.date }}: {{ withdrawal.amount }} تومان</li>
+                <li>{{ withdrawal.date|jdate:"Y/m/d H:i" }}: {{ withdrawal.amount|format_price }} ریال</li>
             {% empty %}
                 <li>هیچ برداشتی ثبت نشده است.</li>
             {% endfor %}
@@ -43,7 +55,7 @@
         <h4>وام‌ها</h4>
         <ul>
             {% for loan in loans %}
-                <li>وام {{ loan.amount }} تومان - تاریخ صدور: {{ loan.date_issued }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
+                <li>وام {{ loan.amount|format_price }} ریال - تاریخ صدور: {{ loan.date_issued|jdate:"Y/m/d H:i" }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
             {% empty %}
                 <li>هیچ وامی ثبت نشده است.</li>
             {% endfor %}
@@ -52,7 +64,7 @@
         <h4>پرداخت اقساط</h4>
         <ul>
             {% for payment in installment_payments %}
-                <li>{{ payment.payment_date }}: {{ payment.amount }} تومان برای وام {{ payment.loan.amount }} تومان</li>
+                <li>{{ payment.payment_date|jdate:"Y/m/d H:i" }}: {{ payment.amount|format_price }} ریال برای وام {{ payment.loan.amount|format_price }} ریال</li>
             {% empty %}
                 <li>هیچ پرداخت قسطی ثبت نشده است.</li>
             {% endfor %}
@@ -61,7 +73,7 @@
         <h4>برنامه‌ریزی اقساط</h4>
         <ul>
             {% for plan in installment_plans %}
-                <li>وام {{ plan.loan.amount }} تومان - تعداد اقساط: {{ plan.number_of_installments }} - مبلغ هر قسط: {{ plan.amount_per_installment }} تومان - تاریخ شروع: {{ plan.start_date }}</li>
+                <li>وام {{ plan.loan.amount|format_price }} ریال - تعداد اقساط: {{ plan.number_of_installments }} - مبلغ هر قسط: {{ plan.amount_per_installment|format_price }} ریال - تاریخ شروع: {{ plan.start_date|jdate:"Y/m/d H:i" }}</li>
             {% empty %}
                 <li>هیچ برنامه‌ریزی قسطی ثبت نشده است.</li>
             {% endfor %}
