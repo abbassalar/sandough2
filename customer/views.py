@@ -1,10 +1,13 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Customer
 from .forms import CustomerForm
+from deposit.models import Deposit
+from withdrawal.models import Withdrawal
+from loan.models import Loan
+from installment_payment.models import InstallmentPayment
+from installment_planning.models import InstallmentPlan
+from django.db.models import Q
 
 @login_required
 def create_customer_view(request):
@@ -25,14 +28,26 @@ def customer_search_view(request):
     customers = []
     if query:
         customers = Customer.objects.filter(
-            models.Q(national_id=query) |
-            models.Q(account_number=query) |
-            models.Q(first_name__icontains=query) |
-            models.Q(last_name__icontains=query)
+            Q(national_id=query) |
+            Q(account_number=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
         )
     return render(request, 'customer/customer_search.html', {'customers': customers, 'query': query})
 
 @login_required
 def customer_detail_view(request, customer_id):
     customer = Customer.objects.get(id=customer_id)
-    return render(request, 'customer/customer_detail.html', {'customer': customer})
+    deposits = Deposit.objects.filter(user=customer.user)
+    withdrawals = Withdrawal.objects.filter(user=customer.user)
+    loans = Loan.objects.filter(user=customer.user)
+    installment_payments = InstallmentPayment.objects.filter(user=customer.user)
+    installment_plans = InstallmentPlan.objects.filter(user=customer.user)
+    return render(request, 'customer/customer_detail.html', {
+        'customer': customer,
+        'deposits': deposits,
+        'withdrawals': withdrawals,
+        'loans': loans,
+        'installment_payments': installment_payments,
+        'installment_plans': installment_plans,
+    })

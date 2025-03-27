@@ -21,6 +21,52 @@
             <p><strong>کپی شناسنامه:</strong> <a href="{{ customer.id_copy.url }}" target="_blank">مشاهده</a></p>
         {% endif %}
 
+        <h3>خدمات انجام‌شده</h3>
+        <h4>واریزها</h4>
+        <ul>
+            {% for deposit in deposits %}
+                <li>{{ deposit.date }}: {{ deposit.amount }} تومان</li>
+            {% empty %}
+                <li>هیچ واریزی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+
+        <h4>برداشت‌ها</h4>
+        <ul>
+            {% for withdrawal in withdrawals %}
+                <li>{{ withdrawal.date }}: {{ withdrawal.amount }} تومان</li>
+            {% empty %}
+                <li>هیچ برداشتی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+
+        <h4>وام‌ها</h4>
+        <ul>
+            {% for loan in loans %}
+                <li>وام {{ loan.amount }} تومان - تاریخ صدور: {{ loan.date_issued }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
+            {% empty %}
+                <li>هیچ وامی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+
+        <h4>پرداخت اقساط</h4>
+        <ul>
+            {% for payment in installment_payments %}
+                <li>{{ payment.payment_date }}: {{ payment.amount }} تومان برای وام {{ payment.loan.amount }} تومان</li>
+            {% empty %}
+                <li>هیچ پرداخت قسطی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+
+        <h4>برنامه‌ریزی اقساط</h4>
+        <ul>
+            {% for plan in installment_plans %}
+                <li>وام {{ plan.loan.amount }} تومان - تعداد اقساط: {{ plan.number_of_installments }} - مبلغ هر قسط: {{ plan.amount_per_installment }} تومان - تاریخ شروع: {{ plan.start_date }}</li>
+            {% empty %}
+                <li>هیچ برنامه‌ریزی قسطی ثبت نشده است.</li>
+            {% endfor %}
+        </ul>
+
         <h3>ارائه خدمات</h3>
         <div class="menu">
             <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
