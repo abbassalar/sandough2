@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>جزئیات مشتری</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>جزئیات مشتری</h2>
+        <p><strong>نام:</strong> {{ customer.first_name }}</p>
+        <p><strong>نام خانوادگی:</strong> {{ customer.last_name }}</p>
+        <p><strong>کد ملی:</strong> {{ customer.national_id }}</p>
+        <p><strong>شماره حساب:</strong> {{ customer.account_number }}</p>
+        <p><strong>شماره شناسنامه:</strong> {{ customer.id_number }}</p>
+        <p><strong>شماره تماس:</strong> {{ customer.phone_number }}</p>
+        <p><strong>آدرس:</strong> {{ customer.address }}</p>
+        <p><strong>تاریخ ثبت:</strong> {{ customer.created_at }}</p>
+        {% if customer.id_copy %}
+            <p><strong>کپی شناسنامه:</strong> <a href="{{ customer.id_copy.url }}" target="_blank">مشاهده</a></p>
+        {% endif %}
+
+        <h3>ارائه خدمات</h3>
+        <div class="menu">
+            <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
+            <a href="{% url 'withdrawal' %}" class="menu-btn">برداشت وجه</a>
+            <a href="{% url 'loan' %}" class="menu-btn">درخواست وام</a>
+            <a href="{% url 'installment_payment' %}" class="menu-btn">پرداخت قسط</a>
+            <a href="{% url 'installment_planning' %}" class="menu-btn">برنامه‌ریزی اقساط</a>
+            <a href="{% url 'reports' %}" class="menu-btn">گزارش‌ها</a>
+            <a href="{% url 'balance' %}" class="menu-btn">تراز مالی</a>
+        </div>
+    </div>
+</body>
+</html>

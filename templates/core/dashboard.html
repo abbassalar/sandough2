@@ -25,6 +25,8 @@
 
         <h2>امکانات</h2>
         <div class="menu">
+            <a href="{% url 'create_customer' %}" class="menu-btn">گشودن حساب مشتری</a>
+            <a href="{% url 'customer_search' %}" class="menu-btn">جستجوی مشتری</a>
             <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
             <a href="{% url 'withdrawal' %}" class="menu-btn">برداشت وجه</a>
             <a href="{% url 'loan' %}" class="menu-btn">درخواست وام</a>
