@@ -1,94 +1,55 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>جزئیات مشتری</title>
-    {% load static jformat custom_filters %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <div class="login-container">
-        <h2>جزئیات مشتری</h2>
-        <p><strong>نام:</strong> {{ customer.first_name }}</p>
-        <p><strong>نام خانوادگی:</strong> {{ customer.last_name }}</p>
-        <p><strong>کد ملی:</strong> {{ customer.national_id }}</p>
-        <p><strong>شماره حساب:</strong> {{ customer.account_number }}</p>
-        <p><strong>شماره شناسنامه:</strong> {{ customer.id_number }}</p>
-        <p><strong>شماره تماس:</strong> {{ customer.phone_number }}</p>
-        <p><strong>آدرس:</strong> {{ customer.address }}</p>
-        <p><strong>تاریخ ثبت:</strong> {{ customer.created_at|jdate:"Y/m/d H:i" }}</p>
-        {% if customer.id_copy %}
-            <p><strong>کپی شناسنامه:</strong> <a href="{{ customer.id_copy.url }}" target="_blank">مشاهده</a></p>
-        {% endif %}
+{% extends 'base.html' %}
+{% load static jformat %}
 
-        <a href="{% url 'edit_customer' customer.id %}" class="menu-btn">ویرایش اطلاعات</a>
-        <a href="{% url 'send_message' customer.id %}" class="menu-btn">ارسال پیام</a>
+{% block content %}
+<div class="container">
+    <h2>جزئیات مشتری: {{ customer.first_name }} {{ customer.last_name }}</h2>
+    <p><strong>کد ملی:</strong> {{ customer.national_id }}</p>
+    <p><strong>شماره تماس:</strong> {{ customer.phone_number }}</p>
+    <p><strong>آدرس:</strong> {{ customer.address }}</p>
 
-        <h3>پیام‌ها</h3>
+    <h3>حساب‌ها</h3>
+    {% if accounts %}
         <ul>
-            {% for message in messages %}
-                <li>{{ message.sent_at|jdate:"Y/m/d H:i" }}: {{ message.content }} (وضعیت: {% if message.is_read %}خوانده‌شده{% else %}خوانده‌نشده{% endif %})</li>
-            {% empty %}
-                <li>هیچ پیامی برای این مشتری ثبت نشده است.</li>
-            {% endfor %}
+        {% for account in accounts %}
+            <li>شماره حساب: {{ account.account_number }} - موجودی: {{ account.balance }}</li>
+        {% endfor %}
         </ul>
+    {% else %}
+        <p>حسابی برای این مشتری وجود ندارد.</p>
+    {% endif %}
 
-        <h3>خدمات انجام‌شده</h3>
-        <h4>واریزها</h4>
+    <h3>تراکنش‌ها</h3>
+    {% if transactions %}
         <ul>
-            {% for deposit in deposits %}
-                <li>{{ deposit.date|jdate:"Y/m/d H:i" }}: {{ deposit.amount|format_price }} ریال</li>
-            {% empty %}
-                <li>هیچ واریزی ثبت نشده است.</li>
-            {% endfor %}
+        {% for transaction in transactions %}
+            <li>{{ transaction.get_type_display }} - مبلغ: {{ transaction.amount }} - تاریخ: {{ transaction.date_jalali }}</li>
+        {% endfor %}
         </ul>
+    {% else %}
+        <p>تراکنشی برای این مشتری وجود ندارد.</p>
+    {% endif %}
 
-        <h4>برداشت‌ها</h4>
+    <h3>وام‌ها</h3>
+    {% if loans %}
         <ul>
-            {% for withdrawal in withdrawals %}
-                <li>{{ withdrawal.date|jdate:"Y/m/d H:i" }}: {{ withdrawal.amount|format_price }} ریال</li>
-            {% empty %}
-                <li>هیچ برداشتی ثبت نشده است.</li>
-            {% endfor %}
+        {% for loan in loans %}
+            <li>مبلغ وام: {{ loan.amount }} - تاریخ صدور: {{ loan.date_issued_jalali }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
+        {% endfor %}
         </ul>
+    {% else %}
+        <p>وامی برای این مشتری وجود ندارد.</p>
+    {% endif %}
 
-        <h4>وام‌ها</h4>
-        <ul>
-            {% for loan in loans %}
-                <li>وام {{ loan.amount|format_price }} ریال - تاریخ صدور: {{ loan.date_issued|jdate:"Y/m/d H:i" }} - وضعیت: {% if loan.is_paid %}پرداخت‌شده{% else %}فعال{% endif %}</li>
-            {% empty %}
-                <li>هیچ وامی ثبت نشده است.</li>
-            {% endfor %}
-        </ul>
-
-        <h4>پرداخت اقساط</h4>
-        <ul>
-            {% for payment in installment_payments %}
-                <li>{{ payment.payment_date|jdate:"Y/m/d H:i" }}: {{ payment.amount|format_price }} ریال برای وام {{ payment.loan.amount|format_price }} ریال</li>
-            {% empty %}
-                <li>هیچ پرداخت قسطی ثبت نشده است.</li>
-            {% endfor %}
-        </ul>
-
-        <h4>برنامه‌ریزی اقساط</h4>
-        <ul>
-            {% for plan in installment_plans %}
-                <li>وام {{ plan.loan.amount|format_price }} ریال - تعداد اقساط: {{ plan.number_of_installments }} - مبلغ هر قسط: {{ plan.amount_per_installment|format_price }} ریال - تاریخ شروع: {{ plan.start_date|jdate:"Y/m/d H:i" }}</li>
-            {% empty %}
-                <li>هیچ برنامه‌ریزی قسطی ثبت نشده است.</li>
-            {% endfor %}
-        </ul>
-
-        <h3>ارائه خدمات</h3>
-        <div class="menu">
-            <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
-            <a href="{% url 'withdrawal' %}" class="menu-btn">برداشت وجه</a>
-            <a href="{% url 'loan' %}" class="menu-btn">درخواست وام</a>
-            <a href="{% url 'installment_payment' %}" class="menu-btn">پرداخت قسط</a>
-            <a href="{% url 'installment_planning' %}" class="menu-btn">برنامه‌ریزی اقساط</a>
-            <a href="{% url 'reports' %}" class="menu-btn">گزارش‌ها</a>
-            <a href="{% url 'balance' %}" class="menu-btn">تراز مالی</a>
-        </div>
+    <h3>ارائه خدمات</h3>
+    <div class="menu">
+        <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
+        <a href="{% url 'withdrawal' %}" class="menu-btn">برداشت وجه</a>
+        <a href="{% url 'loan' %}" class="menu-btn">درخواست وام</a>
+        <a href="{% url 'installment_payment' %}" class="menu-btn">پرداخت قسط</a>
+        <a href="{% url 'installment_planning' %}" class="menu-btn">برنامه‌ریزی اقساط</a>
+        <a href="{% url 'reports' %}" class="menu-btn">گزارش‌ها</a>
+        <a href="{% url 'balance' %}" class="menu-btn">تراز مالی</a>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

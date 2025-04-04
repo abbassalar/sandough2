@@ -12,15 +12,13 @@ def format_price(value):
         return value
 
 @register.filter
-def to_jalali(value, format_string="Y/m/d H:i"):
-    print(f"Input value: {value}, type: {type(value)}")  # دیباگ: چاپ مقدار ورودی
+def to_jalali(value, format_string="%Y/%m/%d %H:%M"):
     try:
+        if not value:
+            return "تاریخ نامعتبر"
         # تبدیل تاریخ میلادی به شمسی
         jalali_date = jdatetime.datetime.fromgregorian(datetime=value)
-        # فرمت کردن تاریخ شمسی
-        result = jalali_date.strftime(format_string)
-        print(f"Converted to Jalali: {result}")  # دیباگ: چاپ نتیجه
-        return result
+        # فرمت کردن تاریخ شمسی با فرمت استاندارد پایتون
+        return jalali_date.strftime(format_string)
     except (ValueError, TypeError) as e:
-        print(f"Error in to_jalali: {e}")  # دیباگ: چاپ خطا
-        return value
+        return f"خطا در تبدیل تاریخ: {str(e)}"

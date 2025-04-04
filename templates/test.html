@@ -6,6 +6,7 @@
     {% load custom_filters %}
 </head>
 <body>
-    <p>تاریخ فعلی: {{ today|to_jalali:"Y/m/d H:i" }}</p>
+    <p>تاریخ خام: {{ today }}</p>
+    <p>تاریخ شمسی: {{ today|to_jalali:"%Y/%m/%d %H:%M" }}</p>
 </body>
 </html>

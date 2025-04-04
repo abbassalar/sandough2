@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>جزئیات وام</title>
+</head>
+<body>
+    <h1>جزئیات وام شماره {{ loan.id }}</h1>
+    <p>مبلغ وام: {{ loan.amount }}</p>
+    <p>تاریخ صدور: {{ loan.date_issued }}</p>
+
+    <h2>پرداخت‌های قسط</h2>
+    {% if payments %}
+        <ul>
+            {% for payment in payments %}
+                <li>مبلغ: {{ payment.amount }} - تاریخ پرداخت: {{ payment.payment_date }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>هنوز پرداختی برای این وام ثبت نشده است.</p>
+    {% endif %}
+
+    <p><a href="{% url 'installment_payment' loan.id %}">پرداخت قسط جدید</a></p>
+    <p><a href="{% url 'loan' %}">بازگشت به صفحه وام‌ها</a></p>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

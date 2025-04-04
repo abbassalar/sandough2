@@ -1,13 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Customer, Message
-from .forms import CustomerForm
-from deposit.models import Deposit
-from withdrawal.models import Withdrawal
+from core.models import Account, Transaction
 from loan.models import Loan
-from installment_payment.models import InstallmentPayment
-from installment_planning.models import InstallmentPlan
-from django.db.models import Q
+from .forms import CustomerForm
+import jdatetime
+
 
 @login_required
 def create_customer_view(request):
@@ -17,66 +16,128 @@ def create_customer_view(request):
             customer = form.save(commit=False)
             customer.user = request.user
             customer.save()
-            # ارسال پیام خوش‌آمدگویی
-            Message.objects.create(
+            print(f"Created customer with ID: {customer.id}")
+
+            # ایجاد حساب جدید با شماره حساب واردشده
+            account_number = form.cleaned_data['account_number']
+            Account.objects.create(
                 customer=customer,
-                content=f"خوش آمدید، {customer.first_name} {customer.last_name}! حساب شما با موفقیت ایجاد شد."
+                account_number=account_number,
+                account_type='SAVINGS',  # می‌تونی اینو توی فرم از کاربر بگیری
+                balance=0.00
             )
-            return redirect('customer_search')
+
+            messages.success(request, 'مشتری و حساب با موفقیت ایجاد شد.')
+            return redirect('customer_detail', customer_id=customer.id)
     else:
         form = CustomerForm()
+
     return render(request, 'customer/create_customer.html', {'form': form})
+
 
 @login_required
 def customer_search_view(request):
     query = request.GET.get('query', '')
-    customers = []
-    if query:
-        customers = Customer.objects.filter(
-            Q(national_id=query) |
-            Q(account_number=query) |
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query)
-        )
+    customers = Customer.objects.filter(phone_number__contains=query) if query else Customer.objects.all()
     return render(request, 'customer/customer_search.html', {'customers': customers, 'query': query})
+
 
 @login_required
 def customer_detail_view(request, customer_id):
-    customer = Customer.objects.get(id=customer_id)
-    deposits = Deposit.objects.filter(user=customer.user)
-    withdrawals = Withdrawal.objects.filter(user=customer.user)
-    loans = Loan.objects.filter(user=customer.user)
-    installment_payments = InstallmentPayment.objects.filter(user=customer.user)
-    installment_plans = InstallmentPlan.objects.filter(user=customer.user)
-    messages = Message.objects.filter(customer=customer)
+    print(f"Received customer_id: {customer_id}")
+    try:
+        customer = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        messages.error(request, 'مشتری موردنظر یافت نشد.')
+        return redirect('customer_search')
+
+    print(f"Type of customer after get: {type(customer)}")
+    print(f"Customer value after get: {customer}")
+
+    if not isinstance(customer, Customer):
+        print("Error: customer is not a Customer instance!")
+        raise ValueError("customer must be a Customer instance")
+
+    print(f"Type of customer before accounts query: {type(customer)}")
+    print(f"Customer value before accounts query: {customer}")
+
+    accounts = Account.objects.filter(customer=customer)
+    print(f"Accounts retrieved: {accounts}")
+
+    transactions = Transaction.objects.filter(account__customer=customer)
+    print(f"Transactions retrieved: {transactions}")
+
+    loans = Loan.objects.filter(customer=customer)
+    print(f"Loans retrieved: {loans}")
+
+    transactions_with_jalali = []
+    for transaction in transactions:
+        transaction.date_jalali = jdatetime.datetime.fromgregorian(datetime=transaction.date).strftime('%Y/%m/%d %H:%M')
+        transactions_with_jalali.append(transaction)
+
+    loans_with_jalali = []
+    for loan in loans:
+        loan.date_issued_jalali = jdatetime.datetime.fromgregorian(datetime=loan.date_issued).strftime('%Y/%m/%d %H:%M')
+        loans_with_jalali.append(loan)
+
     return render(request, 'customer/customer_detail.html', {
         'customer': customer,
-        'deposits': deposits,
-        'withdrawals': withdrawals,
-        'loans': loans,
-        'installment_payments': installment_payments,
-        'installment_plans': installment_plans,
-        'messages': messages,
+        'accounts': accounts,
+        'transactions': transactions_with_jalali,
+        'loans': loans_with_jalali,
     })
+
 
 @login_required
 def edit_customer_view(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
+    try:
+        customer = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        messages.error(request, 'مشتری موردنظر یافت نشد.')
+        return redirect('customer_search')
+
     if request.method == 'POST':
         form = CustomerForm(request.POST, request.FILES, instance=customer)
         if form.is_valid():
-            form.save()
+            customer = form.save()
+            # به‌روزرسانی شماره حساب توی مدل Account
+            account = Account.objects.filter(customer=customer).first()
+            if account:
+                account_number = form.cleaned_data['account_number']
+                # چک کردن اینکه شماره حساب جدید تکراری نباشه
+                if Account.objects.exclude(customer=customer).filter(account_number=account_number).exists():
+                    messages.error(request, 'این شماره حساب قبلاً برای مشتری دیگری ثبت شده است.')
+                    return render(request, 'customer/edit_customer.html', {'customer': customer, 'form': form})
+                account.account_number = account_number
+                account.save()
+            messages.success(request, 'اطلاعات مشتری و حساب با موفقیت ویرایش شد.')
             return redirect('customer_detail', customer_id=customer.id)
     else:
         form = CustomerForm(instance=customer)
-    return render(request, 'customer/edit_customer.html', {'form': form, 'customer': customer})
+        # پر کردن فیلد account_number با مقدار فعلی
+        account = Account.objects.filter(customer=customer).first()
+        if account:
+            form.initial['account_number'] = account.account_number
+
+    return render(request, 'customer/edit_customer.html', {'customer': customer, 'form': form})
+
 
 @login_required
 def send_message_view(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id)
+    try:
+        customer = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        messages.error(request, 'مشتری موردنظر یافت نشد.')
+        return redirect('customer_search')
+
     if request.method == 'POST':
         content = request.POST.get('content')
-        if content:
-            Message.objects.create(customer=customer, content=content)
-            return redirect('customer_detail', customer_id=customer.id)
+        Message.objects.create(
+            customer=customer,
+            content=content,
+            sent_at=jdatetime.datetime.now()
+        )
+        messages.success(request, 'پیام با موفقیت ارسال شد.')
+        return redirect('customer_detail', customer_id=customer.id)
+
     return render(request, 'customer/send_message.html', {'customer': customer})

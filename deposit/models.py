@@ -1,13 +1,14 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
-from django.contrib.auth.models import User
+from core.models import Account
 
 class Deposit(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateTimeField(auto_now_add=True)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='deposits')
+    amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="مبلغ واریز")
+    date = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ واریز")
 
     def __str__(self):
-        return f"{self.user.username} - {self.amount}"
+        return f"Deposit to {self.account} - {self.amount}"
+
+    class Meta:
+        verbose_name = "واریز"
+        verbose_name_plural = "واریزها"

@@ -6,21 +6,119 @@
     <title>ثبت‌نام - صندوق قرض‌الحسنه</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: 'Vazir', Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: none;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .error-message, .success-message {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .error-message {
+            color: #e74c3c;
+        }
+        .success-message {
+            color: #28a745;
+        }
+        .register-btn {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .register-btn:hover {
+            background-color: #218838;
+        }
+        .footer-text {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .footer-text a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="register-container">
         <h2>ثبت‌نام در صندوق قرض‌الحسنه</h2>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <p class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <label for="username">نام کاربری</label>
-                <input type="text" id="username" name="username" placeholder="نام کاربری" required>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
                 <label for="password">رمز عبور</label>
-                <input type="password" id="password" name="password" placeholder="رمز عبور" required>
+                <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="login-btn">ثبت‌نام</button>
+            <button type="submit" class="register-btn">ثبت‌نام</button>
         </form>
         <div class="footer-text">
             حساب دارید؟ <a href="{% url 'login' %}">وارد شوید</a>

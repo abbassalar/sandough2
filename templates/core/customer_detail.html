@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جزئیات مشتری</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #f1f3f5; }
+        .container { max-width: 800px; margin-top: 50px; }
+        .card { margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4">جزئیات مشتری: {{ customer.first_name }} {{ customer.last_name }}</h2>
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">اطلاعات مشتری</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>کد ملی:</strong> {{ customer.national_code }}</p>
+                <p><strong>شماره تلفن:</strong> {{ customer.phone_number }}</p>
+                <p><strong>آدرس:</strong> {{ customer.address }}</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">وام‌ها</h5>
+            </div>
+            <div class="card-body">
+                {% if loans %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>شماره وام</th>
+                                <th>مبلغ</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in loans %}
+                                <tr>
+                                    <td>{{ loan.id }}</td>
+                                    <td>{{ loan.amount }}</td>
+                                    <td>
+                                        {% if loan.is_active %}
+                                            <span class="badge bg-success">فعال</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">غیرفعال</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">هیچ وامی وجود ندارد.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">حساب‌ها</h5>
+            </div>
+            <div class="card-body">
+                {% if accounts %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>شماره حساب</th>
+                                <th>موجودی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in accounts %}
+                                <tr>
+                                    <td>{{ account.account_number }}</td>
+                                    <td>{{ account.balance }} تومان</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">هیچ حسابی وجود ندارد.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">تراکنش‌ها</h5>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>نوع تراکنش</th>
+                                <th>مبلغ</th>
+                                <th>تاریخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction.transaction_type }}</td>
+                                    <td>{{ transaction.amount }} تومان</td>
+                                    <td>{{ transaction.date_shamsi|default:transaction.date|date:"Y/m/d H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">هیچ تراکنشی وجود ندارد.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100">بازگشت به داشبورد</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

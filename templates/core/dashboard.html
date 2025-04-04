@@ -2,50 +2,379 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>داشبورد</title>
-    {% load static jformat custom_filters %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- لود بوت‌استرپ CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- لود فونت ایران‌سنس -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <!-- لود Font Awesome برای آیکون‌ها -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2Lw==" crossorigin="anonymous">
+    <!-- لود DataTables برای جدول‌های تعاملی -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f1f3f5;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            color: #dfe6e9;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+        .content {
+            padding: 30px;
+        }
+        .card {
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand, .navbar-text {
+            color: white !important;
+        }
+        .balance-card {
+            background-color: #28a745;
+            color: white;
+        }
+        .notification-card {
+            background-color: #ffc107;
+        }
+        .summary-card {
+            text-align: center;
+            color: white;
+            border-radius: 10px;
+        }
+        .summary-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .dataTable thead {
+            background-color: #f8f9fa;
+        }
+        .table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>خوش آمدید، {{ user.username }}!</h1>
-
-        <!-- نمایش اعلان‌ها -->
-        <h2>اعلان‌ها</h2>
-        <ul class="notifications">
-            {% for notification in notifications %}
-                <li>{{ notification.created_at|jdate:"Y/m/d H:i" }}: {{ notification.message }}</li>
-            {% empty %}
-                <li>هیچ اعلان جدیدی ندارید.</li>
-            {% endfor %}
-        </ul>
-
-        <div class="balance-box">
-            <h2>موجودی شما: {{ balance.total_balance|format_price }} ریال</h2>
-            <p>آخرین به‌روزرسانی: {{ balance.last_updated|jdate:"Y/m/d H:i" }}</p>
+    <!-- نوار بالا -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">سامانه مدیریت صندوق</a>
+            <div class="ms-auto">
+                <span class="navbar-text me-3">خوش آمدید، {{ request.user.username }}!</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light">خروج</a>
+            </div>
         </div>
+    </nav>
 
-        <h2>وام‌های فعال</h2>
-        <ul>
-            {% for loan in loans %}
-                <li>وام {{ loan.amount|format_price }} ریال - تاریخ صدور: {{ loan.date_issued|jdate:"Y/m/d H:i" }}</li>
-            {% empty %}
-                <li>هیچ وام فعالی ندارید.</li>
-            {% endfor %}
-        </ul>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- سایدبار -->
+            <nav class="col-md-3 col-lg-2 sidebar">
+                <h4 class="text-center mb-4">منو</h4>
+                <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i> داشبورد</a>
+                <a href="{% url 'create_customer' %}"><i class="fas fa-user-plus me-2"></i> ایجاد مشتری جدید</a>
+                <a href="{% url 'customer_search' %}"><i class="fas fa-search me-2"></i> جستجوی مشتری</a>
+                <a href="{% url 'loan' %}"><i class="fas fa-money-check-alt me-2"></i> مدیریت وام‌ها</a>
+                <a href="{% url 'edit_profile' %}"><i class="fas fa-user-edit me-2"></i> ویرایش پروفایل</a>
+            </nav>
 
-        <h2>امکانات</h2>
-        <div class="menu">
-            <a href="{% url 'create_customer' %}" class="menu-btn">گشودن حساب مشتری</a>
-            <a href="{% url 'customer_search' %}" class="menu-btn">جستجوی مشتری</a>
-            <a href="{% url 'deposit' %}" class="menu-btn">واریز وجه</a>
-            <a href="{% url 'withdrawal' %}" class="menu-btn">برداشت وجه</a>
-            <a href="{% url 'loan' %}" class="menu-btn">درخواست وام</a>
-            <a href="{% url 'installment_payment' %}" class="menu-btn">پرداخت قسط</a>
-            <a href="{% url 'installment_planning' %}" class="menu-btn">برنامه‌ریزی اقساط</a>
-            <a href="{% url 'reports' %}" class="menu-btn">گزارش‌ها</a>
-            <a href="{% url 'balance' %}" class="menu-btn">تراز مالی</a>
+            <!-- محتوای اصلی -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 content">
+                <!-- نمایش پیام‌ها -->
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- خلاصه اطلاعات -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card summary-card" style="background-color: #007bff;">
+                            <div class="card-body">
+                                <i class="fas fa-users"></i>
+                                <h5>تعداد مشتری‌ها</h5>
+                                <h3>{{ customers|length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card summary-card" style="background-color: #28a745;">
+                            <div class="card-body">
+                                <i class="fas fa-money-check-alt"></i>
+                                <h5>تعداد وام‌ها</h5>
+                                <h3>{{ loans|length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card summary-card" style="background-color: #17a2b8;">
+                            <div class="card-body">
+                                <i class="fas fa-university"></i>
+                                <h5>تعداد حساب‌ها</h5>
+                                <h3>{{ accounts|length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- کارت موجودی (اگه کاربر عادی باشه) -->
+                {% if not request.user.is_superuser and balance %}
+                    <div class="card balance-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-wallet me-2"></i> موجودی شما</h5>
+                        </div>
+                        <div class="card-body">
+                            <h3>{{ balance.amount }} تومان</h3>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- بخش اعلان‌ها -->
+                {% if notifications %}
+                    <div class="card notification-card">
+                        <div class="card-header text-white">
+                            <h5 class="mb-0"><i class="fas fa-bell me-2"></i> اعلان‌ها</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped" id="notificationsTable">
+                                <thead>
+                                    <tr>
+                                        <th>پیام</th>
+                                        <th>تاریخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for notification in notifications %}
+                                        <tr>
+                                            <td>{{ notification.message }}</td>
+                                            <td>{{ notification.created_at_shamsi|default:notification.created_at|date:"Y/m/d H:i" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- بخش مشتری‌ها -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i> لیست مشتری‌ها</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="action-buttons">
+                            <a href="{% url 'create_customer' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i> ایجاد مشتری جدید</a>
+                        </div>
+                        {% if customers %}
+                            <table class="table table-striped" id="customersTable">
+                                <thead>
+                                    <tr>
+                                        <th>نام</th>
+                                        <th>نام خانوادگی</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for customer in customers %}
+                                        <tr>
+                                            <td>{{ customer.first_name }}</td>
+                                            <td>{{ customer.last_name }}</td>
+                                            <td>
+                                                <a href="{% url 'customer_detail' customer.id %}" class="btn btn-sm btn-outline-primary">جزئیات</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="text-muted">هیچ مشتری‌ای وجود ندارد. <a href="{% url 'create_customer' %}">مشتری جدید ایجاد کنید</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- بخش وام‌ها -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-money-check-alt me-2"></i> لیست وام‌ها</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="action-buttons">
+                            <a href="{% url 'loan' %}" class="btn btn-success"><i class="fas fa-plus me-2"></i> ایجاد وام جدید</a>
+                        </div>
+                        {% if loans %}
+                            <table class="table table-striped" id="loansTable">
+                                <thead>
+                                    <tr>
+                                        <th>شماره وام</th>
+                                        <th>مبلغ</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for loan in loans %}
+                                        <tr>
+                                            <td>{{ loan.id }}</td>
+                                            <td>{{ loan.amount }}</td>
+                                            <td>
+                                                {% if loan.is_active %}
+                                                    <span class="badge bg-success">فعال</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">غیرفعال</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'installment_payment' loan.id %}" class="btn btn-sm btn-outline-success me-2">پرداخت قسط</a>
+                                                <a href="{% url 'loan_detail' loan.id %}" class="btn btn-sm btn-outline-info">جزئیات</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="text-muted">هیچ وام فعالی وجود ندارد. <a href="{% url 'loan' %}">وام جدید ایجاد کنید</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- بخش حساب‌ها -->
+                {% if accounts %}
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-university me-2"></i> لیست حساب‌ها</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="action-buttons">
+                                <a href="{% url 'create_account' %}" class="btn btn-info"><i class="fas fa-plus me-2"></i> ایجاد حساب جدید</a>
+                            </div>
+                            <table class="table table-striped" id="accountsTable">
+                                <thead>
+                                    <tr>
+                                        <th>شماره حساب</th>
+                                        <th>موجودی</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                        <tr>
+                                            <td>{{ account.account_number }}</td>
+                                            <td>{{ account.balance }} تومان</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- بخش تراکنش‌ها -->
+                {% if transactions %}
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i> لیست تراکنش‌ها</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped" id="transactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>نوع تراکنش</th>
+                                        <th>مبلغ</th>
+                                        <th>تاریخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions %}
+                                        <tr>
+                                            <td>{{ transaction.transaction_type }}</td>
+                                            <td>{{ transaction.amount }} تومان</td>
+                                            <td>{{ transaction.date_shamsi|default:transaction.date|date:"Y/m/d H:i" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+            </main>
         </div>
     </div>
+
+    <!-- لود jQuery (برای DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- لود بوت‌استرپ JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- لود DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#customersTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fa.json"
+                }
+            });
+            $('#loansTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fa.json"
+                }
+            });
+            $('#accountsTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fa.json"
+                }
+            });
+            $('#transactionsTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fa.json"
+                }
+            });
+            $('#notificationsTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fa.json"
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>پرداخت قسط وام</title>
+</head>
+<body>
+    <h1>پرداخت قسط برای وام شماره {{ loan.id }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="amount">مبلغ قسط:</label>
+        <input type="number" name="amount" id="amount" step="0.01" required>
+        <button type="submit">پرداخت</button>
+    </form>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

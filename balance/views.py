@@ -8,6 +8,7 @@ from deposit.models import Deposit
 from withdrawal.models import Withdrawal
 from django.db.models import Sum
 
+
 @login_required
 def balance_view(request):
     balance, created = Balance.objects.get_or_create(user=request.user)

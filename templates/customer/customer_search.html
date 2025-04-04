@@ -1,33 +1,32 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>جستجوی مشتری</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <div class="login-container">
-        <h2>جستجوی مشتری</h2>
-        <form method="GET">
-            <div class="form-group">
-                <label for="query">جستجو (کد ملی، شماره حساب، نام یا نام خانوادگی):</label>
-                <input type="text" id="query" name="query" value="{{ query }}">
-            </div>
-            <button type="submit" class="login-btn">جستجو</button>
-        </form>
-        <h3>نتایج جستجو</h3>
-        <ul>
-            {% for customer in customers %}
-                <li>
-                    <a href="{% url 'customer_detail' customer.id %}">
-                        {{ customer.first_name }} {{ customer.last_name }} - کد ملی: {{ customer.national_id }}
-                    </a>
-                </li>
-            {% empty %}
-                <li>مشتری‌ای یافت نشد.</li>
-            {% endfor %}
-        </ul>
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="login-container">
+    <h2>جستجوی مشتری</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="GET">
+        <div class="form-group">
+            <label for="query">جستجو (کد ملی، شماره حساب، نام یا نام خانوادگی):</label>
+            <input type="text" id="query" name="query" value="{{ query }}" class="form-control" placeholder="جستجو...">
+        </div>
+        <button type="submit" class="login-btn">جستجو</button>
+    </form>
+    <h3>نتایج جستجو</h3>
+    <ul class="customer-list">
+        {% for customer in customers %}
+            <li>
+                <a href="{% url 'customer_detail' customer.id %}">
+                    {{ customer.first_name }} {{ customer.last_name }} - کد ملی: {{ customer.national_id }}
+                </a>
+            </li>
+        {% empty %}
+            <li>مشتری‌ای یافت نشد.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

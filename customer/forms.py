@@ -1,19 +1,24 @@
 from django import forms
+from django.core.validators import RegexValidator  # وارد کردن RegexValidator
 from .models import Customer
-
+from core.models import Account
 
 class CustomerForm(forms.ModelForm):
+    account_number = forms.CharField(
+        max_length=20,
+        label="شماره حساب",
+        validators=[RegexValidator(r'^\d+$', 'شماره حساب باید فقط شامل اعداد باشد')]  # اصلاح forms.RegexValidator به RegexValidator
+    )
+
     class Meta:
         model = Customer
-        fields = ['national_id', 'account_number', 'id_number', 'first_name', 'last_name', 'phone_number', 'address',
-                  'id_copy']
+        fields = ['first_name', 'last_name', 'national_id', 'id_number', 'phone_number', 'address', 'id_copy']
         labels = {
-            'national_id': 'کد ملی',
-            'account_number': 'شماره حساب',
-            'id_number': 'شماره شناسنامه',
             'first_name': 'نام',
             'last_name': 'نام خانوادگی',
-            'phone_number': 'شماره تماس',
+            'national_id': 'کد ملی',
+            'id_number': 'شماره شناسنامه',
+            'phone_number': 'شماره تلفن',
             'address': 'آدرس',
             'id_copy': 'کپی شناسنامه',
         }
@@ -23,27 +28,18 @@ class CustomerForm(forms.ModelForm):
 
     def clean_national_id(self):
         national_id = self.cleaned_data['national_id']
-
-        # چک کردن طول و اینکه فقط عدد باشه
-        if len(national_id) != 10 or not national_id.isdigit():
-            raise forms.ValidationError("کد ملی باید 10 رقم باشد و فقط شامل اعداد باشد.")
-
-        # چک کردن اینکه همه ارقام یکسان نباشن (مثلاً 1111111111)
-        if len(set(national_id)) == 1:
-            raise forms.ValidationError("کد ملی معتبر نیست (همه ارقام یکسان هستند).")
-
-        # الگوریتم اعتبارسنجی کد ملی
-        check_digit = int(national_id[-1])  # رقم آخر (رقم کنترلی)
-        total = 0
-        for i in range(9):
-            total += int(national_id[i]) * (10 - i)
-        remainder = total % 11
-        if remainder < 2:
-            expected_check_digit = remainder
-        else:
-            expected_check_digit = 11 - remainder
-
-        if check_digit != expected_check_digit:
-            raise forms.ValidationError("کد ملی معتبر نیست.")
-
+        if Customer.objects.exclude(pk=self.instance.pk).filter(national_id=national_id).exists():
+            raise forms.ValidationError('این کد ملی قبلاً ثبت شده است.')
         return national_id
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data['phone_number']
+        if Customer.objects.exclude(pk=self.instance.pk).filter(phone_number=phone_number).exists():
+            raise forms.ValidationError('این شماره تلفن قبلاً ثبت شده است.')
+        return phone_number
+
+    def clean_account_number(self):
+        account_number = self.cleaned_data['account_number']
+        if Account.objects.filter(account_number=account_number).exists():
+            raise forms.ValidationError('این شماره حساب قبلاً ثبت شده است.')
+        return account_number

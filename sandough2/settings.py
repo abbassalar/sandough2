@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'deposit.apps.DepositConfig',
     'withdrawal.apps.WithdrawalConfig',
     'loan.apps.LoanConfig',
-    'installment_payment.apps.InstallmentPaymentConfig',
-    'installment_planning.apps.InstallmentPlanningConfig',
     'reports.apps.ReportsConfig',
     'balance.apps.BalanceConfig',
     'customer.apps.CustomerConfig',
@@ -87,11 +85,11 @@ WSGI_APPLICATION = 'sandough2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sandough2_sql',  # اسم دیتابیسی که ساختی
-        'USER': 'postgres',  # کاربر پیش‌فرض PostgreSQL
-        'PASSWORD': 'a1b2b3a4s5',  # رمزی که برای PostgreSQL تعیین کردی
-        'HOST': 'localhost',  # چون دیتابیس روی سیستم خودته
-        'PORT': '5432',  # پورت پیش‌فرض PostgreSQL
+        'NAME': 'sandough2_new',  # اسم دیتابیس جدیدت
+        'USER': 'postgres',       # نام کاربری PostgreSQL
+        'PASSWORD': 'a1b2b3a4s5',  # رمز عبوری که برای postgres تنظیم کردی
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
